@@ -52,7 +52,7 @@ def screen_projection(row):
     return (line_point + line_vector *z_t).astype(int)[[0, 1]]
 
 def sphere_projection(row):
-    
+    pass
  
 def multi_projection(row):
     r1 = edge_projection(row)
