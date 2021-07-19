@@ -1,0 +1,1 @@
+This directory is for plots created with matplotlib.

@@ -1,0 +1,1 @@
+This directory is for storing CSV data obtained from OpenFace and OpenSmile.

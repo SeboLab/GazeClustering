@@ -4,10 +4,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.sparse.construct import rand
-
 from sklearn.cluster import KMeans
-from sklearn.datasets import make_blobs
 
 GAZE_ANGLE_X = ' gaze_angle_x'
 GAZE_ANGLE_Y = ' gaze_angle_y'
@@ -18,14 +15,9 @@ GAZE_1_X = ' gaze_1_x'
 GAZE_1_Y = ' gaze_1_y'
 GAZE_1_Z = ' gaze_1_z'
 
+
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
-
-
-
-# %%
-
-
 # %%
 def edge_projection(row, frame_shape):
     # frame shape is (width, height)
@@ -69,6 +61,7 @@ import glob
 
 MAX_NUMS = 0
 CAMERA = "camera2"
+USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0']
 
 path = r"/media/sebo-hri-lab/DATA/OpenFace/" # use your path
 all_files = glob.glob(path + "/*.csv")
@@ -81,11 +74,12 @@ for filename in all_files:
         print('reading '+filename)
         if i>MAX_NUMS:
             break
-        df = pd.read_csv(filename, index_col=None, header=0)
+        df = pd.read_csv(filename, index_col=None, usecols=USED_COLS, header=0)
         li.append(df)
         i+=1
 
 frame = pd.concat(li, axis=0, ignore_index=True)
+print(frame)
 
 
 # %%
@@ -95,11 +89,11 @@ for index, row in frame.iterrows():
         res = edge_projection(row,(FRAME_WIDTH,FRAME_HEIGHT))
         vectorList[index] = res[0],res[1]#[row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z], row[GAZE_1_X], row[GAZE_1_Y], row[GAZE_1_Z]]
 
-
+print("trained kmeans")
 # %%
 kmeans = KMeans(n_clusters=6,random_state=0).fit(vectorList)
 predictions = kmeans.predict(vectorList)
-
+'''
 colors = np.array([(0,0,1),(0,1,0),(1,0,1),(0,1,1),(1,0,0),(0,0,0)])
 
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
@@ -108,8 +102,13 @@ plt.gca().invert_yaxis()
 plt.show()
 plt.savefig('class.png')
 
-
+'''
 # %%
+import pickle
+
+with open(CAMERA+'_clustering.pickle', 'wb') as handle:
+    pickle.dump(kmeans, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 
 

@@ -1,0 +1,1 @@
+This directory is for storing PICKLE files output by the model builder.
