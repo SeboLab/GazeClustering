@@ -54,12 +54,12 @@ colors = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('class_scatter.png')
+plt.savefig('plots/class_scatter.png')
 plt.show()
 plt.hist2d(vectorList[:, 0], vectorList[:, 1], bins=(150, 150), norm=LogNorm())
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('class_hist.png')
+plt.savefig('plots/class_hist.png')
 plt.show()
 
 

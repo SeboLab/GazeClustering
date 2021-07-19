@@ -69,7 +69,7 @@ GROUP_NAME=None
 
 EVAL_GROUP = 'CA'
 #Export title
-MODEL_TITLE = "KMEANS_projection_3D_"
+MODEL_TITLE = "KMEANS_projection_3D"
 #Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
 PROJECTION = screen_projection
 #number of features, 4 for multi_projection, 2 for the rest
@@ -83,8 +83,8 @@ def vec(row):
 ################################################
 
 
-PICKLE_TITLE = MODEL_TITLE+CAMERA+"_clustering.pickle"
-FILE_NAME = "~/Desktop/jibo-survival-trimming/Data_Classification/shrink_data_"+CAMERA+".csv"
+PICKLE_TITLE = f"models/{MODEL_TITLE}_{CAMERA}_clustering.pickle"
+FILE_NAME = f"data/shrink_data_{CAMERA}.csv"
 
 USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0',' eye_lmk_X_0',' eye_lmk_Y_0',' eye_lmk_Z_0']
 
