@@ -19,12 +19,11 @@ with open(config.PICKLE_TITLE, 'rb') as f:
 # %%
 df = pd.read_csv(config.CSV_FILE, usecols=config.USED_COLS)
 df = df.loc[(df!=0).all(1)]
-
 print("reading "+config.CSV_FILE)
 
 
 # %%
-df['occurence'] = df.apply(lambda x: config.projection(x),axis=1)
+df['occurence'] = df.apply(lambda x: config.PROJECTION(x),axis=1)
 
 
 # %%
@@ -33,40 +32,26 @@ vectorList = np.vstack(df['occurence'].to_numpy())
 
 
 # %%
-#Color titles:
-RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
-RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
-RGB_RED,BGR_RED=(1,0,0),(0,0,255)
-RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
-RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
-RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
-RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
-RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
-RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
-RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
-
-
-# %%
 predictions = clusters.predict(vectorList)
 
-colors = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
+colors = config.RGB_COLORS
             
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('plots/class_scatter.png')
+plt.savefig('plots/eval_class_scatter.png')
 plt.show()
 plt.hist2d(vectorList[:, 0], vectorList[:, 1], bins=(150, 150), norm=LogNorm())
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('plots/class_hist.png')
+plt.savefig('plots/eval_class_hist.png')
 plt.show()
 
 
 # %%
 cap = cv2.VideoCapture(config.VIDEO_FILE)
 i = 0
-colors = [BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE]
+colors = config.BGR_COLORS
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 BOX_RADIUS = 30

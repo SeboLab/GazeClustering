@@ -29,6 +29,16 @@ print(f"{len(vectorList)} training frames")
 # %%
 clusters = KMeans(n_clusters=config.N_CLUSTERS).fit(vectorList)
 
+predictions = clusters.predict(vectorList)
+
+colors = config.RGB_COLORS
+            
+plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
+plt.title(f"{config.N_CLUSTERS} Clusters")
+plt.gca().invert_yaxis()
+plt.savefig('plots/class_scatter_sphere.png')
+plt.show()
+
 # %%
 
 with open(config.PICKLE_TITLE, 'wb') as handle:

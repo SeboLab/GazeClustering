@@ -14,6 +14,25 @@ GAZE_1_Z = ' gaze_1_z'
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 
+RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
+RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
+RGB_RED,BGR_RED=(1,0,0),(0,0,255)
+RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
+RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
+RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
+RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
+RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
+RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
+RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
+
+RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
+
+BGR_COLORS = np.array([BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE])
+
+MAX_PROJ_SIZE = 3500
+
+SPHERE_RADIUS = 1000
+
 def edge_projection(row):
     # frame shape is (width, height)
     x_plane_normal = np.array([1, 0, 0])
@@ -49,29 +68,56 @@ def screen_projection(row):
     line_point = np.array([row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'], row[' eye_lmk_Z_0']])
     line_vector = np.array([row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z]])
     z_t = np.dot((z_plane_point - line_point), z_plane_normal) / np.dot(line_vector, z_plane_normal)
-    return (line_point + line_vector *z_t).astype(int)[[0, 1]]
+
+    val =(line_point + line_vector *z_t).astype(int)[[0, 1]]
+    
+    if(val[0]>=MAX_PROJ_SIZE):
+        val[0]=MAX_PROJ_SIZE
+    if(val[1]>=MAX_PROJ_SIZE):
+        val[1]=MAX_PROJ_SIZE
+    if(val[0]<=-MAX_PROJ_SIZE):
+        val[0]=-MAX_PROJ_SIZE
+    if(val[1]<=-MAX_PROJ_SIZE):
+        val[1]=-MAX_PROJ_SIZE
+
+    return val
+
 
 def sphere_projection(row):
-    pass
+    # https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection#Calculation_using_vectors_in_3D
+    c = np.array([0, 0, SPHERE_RADIUS])
+    o = np.array([row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'], row[' eye_lmk_Z_0']])
+    u = np.array([row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z]])
+    
+    b24ac = (np.dot(u, o - c) ** 2) - (np.dot(o - c, o - c) - SPHERE_RADIUS ** 2)
+
+    if b24ac < 0:
+        return np.array(np.zeros(3))
+
+    else:
+        d = -(np.dot(u, o-c)) + b24ac**0.5
+        return (d * u) + o
+
  
 def multi_projection(row):
     r1 = edge_projection(row)
     r2 = screen_projection(row)
     return np.array([r1[0],r1[1],r2[0],r2[1]]).astype(int)
 
+
 def no_projection(row):
     return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_x_0'], row[' eye_lmk_y_0']])
 
 ################################################ Variables to set
-CAMERA = "camera2"
+CAMERA = "camera1"
 #If you want to cluster for a single group, otherwise set to none
 GROUP_NAME=None
 
-EVAL_GROUP = 'CA'
+EVAL_GROUP = 'BS'
 #Export title
-MODEL_TITLE = "KMEANS_projection_3D"
+MODEL_TITLE = "KMEANS_projection_sphere_filtered"
 #Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
-PROJECTION = screen_projection
+PROJECTION = sphere_projection
 #number of features, 4 for multi_projection, 2 for the rest
 N_FEATURES = 5
 #number of CLUSTERS
