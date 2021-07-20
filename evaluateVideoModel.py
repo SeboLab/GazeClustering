@@ -23,29 +23,24 @@ print("reading "+config.CSV_FILE)
 
 
 # %%
-df['occurence'] = df.apply(lambda x: config.PROJECTION(x),axis=1)
-
-
-# %%
-vectorList = np.zeros((len(df),config.N_FEATURES))
-vectorList = np.vstack(df['occurence'].to_numpy())
+vectorList = config.project(df)
 
 
 # %%
 predictions = clusters.predict(vectorList)
 
 colors = config.RGB_COLORS
-            
+
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
 plt.savefig('plots/eval_class_scatter.png')
 plt.show()
-plt.hist2d(vectorList[:, 0], vectorList[:, 1], bins=(150, 150), norm=LogNorm())
-plt.title(f"{config.N_CLUSTERS} Clusters")
-plt.gca().invert_yaxis()
-plt.savefig('plots/eval_class_hist.png')
-plt.show()
+# plt.hist2d(vectorList[:, 0], vectorList[:, 1], bins=(150, 150), norm=LogNorm())
+# plt.title(f"{config.N_CLUSTERS} Clusters")
+# plt.gca().invert_yaxis()
+# plt.savefig('plots/eval_class_hist.png')
+# plt.show()
 
 
 # %%
@@ -73,13 +68,4 @@ while i<len(df):
 cap.release()
 out.release()
 cv2.destroyAllWindows()
-
-
-# %%
-
-
-
-# %%
-
-
 

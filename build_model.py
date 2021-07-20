@@ -21,9 +21,7 @@ else:
 
 
 # %%
-vectorList = np.zeros((len(df),config.N_FEATURES))
-df['occurrence'] = df.apply(lambda x: config.PROJECTION(x),axis=1)
-vectorList = np.vstack(df['occurrence'].to_numpy())
+vectorList = config.project(df)
 print(f"{len(vectorList)} training frames")
 
 # %%
@@ -36,8 +34,7 @@ colors = config.RGB_COLORS
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('plots/class_scatter_sphere.png')
-plt.show()
+plt.savefig('plots/class_scatter_sphere_all.png')
 
 # %%
 

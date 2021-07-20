@@ -95,8 +95,17 @@ def sphere_projection(row):
         return np.array(np.zeros(3))
 
     else:
-        d = -(np.dot(u, o-c)) + b24ac**0.5
-        return (d * u) + o
+        first_term = -(np.dot(u, o-c))
+        d_plus = first_term + b24ac**0.5
+        d_minus = first_term - b24ac**0.5
+        
+        proj_plus = (d_plus * u) + o
+        proj_minus = (d_minus * u) + o
+
+        if proj_minus[2] < proj_plus[2]:
+            return proj_minus
+        else:
+            return proj_plus
 
  
 def multi_projection(row):
@@ -109,11 +118,11 @@ def no_projection(row):
     return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_x_0'], row[' eye_lmk_y_0']])
 
 ################################################ Variables to set
-CAMERA = "camera1"
+CAMERA = "camera3"
 #If you want to cluster for a single group, otherwise set to none
 GROUP_NAME=None
 
-EVAL_GROUP = 'BS'
+EVAL_GROUP = 'AM'
 #Export title
 MODEL_TITLE = "KMEANS_projection_sphere_filtered"
 #Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
@@ -126,6 +135,12 @@ N_CLUSTERS = 10
 #Evaluation features used
 def vec(row):
     return PROJECTION(row)
+
+
+def project(df):
+    vectorFrame = df.apply(lambda x: PROJECTION(x),axis=1)
+    vectorList = np.vstack(vectorFrame.to_numpy())
+    return vectorList
 ################################################
 
 
