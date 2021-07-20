@@ -23,9 +23,9 @@ for filename in all_files:
         if i>MAX_NUMS:
             break
         df = pd.read_csv(filename, index_col=None, usecols=USED_COLS)
-
+        print(df)
         ndf = df.loc[(df!=0).all(1)]
-        ndf.to_csv(FILE_NAME, mode='a',header=None)
+        ndf.to_csv(FILE_NAME, columns=USED_COLS, mode='a', header=None)
         i+=1
 
 print('finished reading lines')

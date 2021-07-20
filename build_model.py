@@ -34,7 +34,7 @@ colors = config.RGB_COLORS
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
 plt.title(f"{config.N_CLUSTERS} Clusters")
 plt.gca().invert_yaxis()
-plt.savefig('plots/class_scatter_sphere_all.png')
+plt.savefig('plots/class_scatter_sphere_fix.png')
 
 # %%
 
