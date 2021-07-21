@@ -18,7 +18,9 @@ with open(config.PICKLE_TITLE, 'rb') as f:
 
 # %%
 df = pd.read_csv(config.CSV_FILE, usecols=config.USED_COLS)
-df = df.loc[(df!=0).all(1)]
+df_mask = (df!=0).all(1)
+df_indices = np.arange(len(df_mask))[df_mask]
+df = df.loc[df_mask]
 print("reading "+config.CSV_FILE)
 
 
@@ -32,7 +34,7 @@ config.save_plots(clusters, vectorList, eval=True)
 predictions = clusters.predict(vectorList)
 
 # show all gaze points in the video
-title = f"select your desired clusters"
+title = f"{config.MODEL_TITLE}_{config.EVAL_GROUP}_{config.CAMERA}\nselect your desired clusters"
 
 fig, current_ax = plt.subplots() 
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=config.RGB_COLORS[predictions], s=1)
@@ -55,7 +57,7 @@ def rectangle_callback(eclick, erelease):
     indices = np.nonzero(x_mask & y_mask)[0]
 
     # sort points by color
-    indices = indices[np.argsort(predictions[indices])]
+    #indices = indices[np.argsort(predictions[indices])]
 
     # read in the video
     cap = cv2.VideoCapture(config.VIDEO_FILE)
@@ -72,8 +74,11 @@ def rectangle_callback(eclick, erelease):
 
     for i in indices:
 
+        # get the index of the frame in the video
+        frame_index = df_indices[i]
+
         # set the video position to the current frame in the list
-        accepted = cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+        accepted = cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
 
         # if the frame set was successful:
         if accepted:
