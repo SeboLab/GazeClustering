@@ -5,7 +5,7 @@ import pandas as pd
 import config
 
 MAX_NUMS = 50
-CAMERA = "camera2"
+CAMERA = "camera3"
 USED_COLS = [config.GAZE_ANGLE_X,config.GAZE_ANGLE_Y,config.GAZE_0_X,config.GAZE_0_Y,config.GAZE_0_Z,config.GAZE_1_X,config.GAZE_1_Y,config.GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0',' eye_lmk_X_0',' eye_lmk_Y_0',' eye_lmk_Z_0']
 FILE_NAME = "data/shrink_data_"+CAMERA+".csv"
 

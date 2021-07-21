@@ -5,8 +5,9 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.cluster import Birch
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import OPTICS
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import pickle
 import config
 
@@ -26,15 +27,13 @@ print(f"{len(vectorList)} training frames")
 
 # %%
 clusters = KMeans(n_clusters=config.N_CLUSTERS).fit(vectorList)
+#clusters = Birch(threshold=0.5, branching_factor=3,n_clusters=config.N_CLUSTERS).fit(vectorList)
 
-predictions = clusters.predict(vectorList)
+#clusters = OPTICS().fit(vectorList)
 
-colors = config.RGB_COLORS
+config.save_plots(clusters, vectorList)
             
-plt.scatter(vectorList[:, 0], vectorList[:, 1], c=colors[predictions], s=1)
-plt.title(f"{config.N_CLUSTERS} Clusters")
-plt.gca().invert_yaxis()
-plt.savefig('plots/class_scatter_sphere_fix.png')
+
 
 # %%
 

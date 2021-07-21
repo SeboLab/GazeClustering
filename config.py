@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 GAZE_ANGLE_X = ' gaze_angle_x'
 GAZE_ANGLE_Y = ' gaze_angle_y'
@@ -13,21 +14,6 @@ GAZE_1_Z = ' gaze_1_z'
 
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
-
-RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
-RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
-RGB_RED,BGR_RED=(1,0,0),(0,0,255)
-RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
-RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
-RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
-RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
-RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
-RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
-RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
-
-RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
-
-BGR_COLORS = np.array([BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE])
 
 MAX_PROJ_SIZE = 3500
 
@@ -115,14 +101,15 @@ def multi_projection(row):
 
 
 def no_projection(row):
-    return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_x_0'], row[' eye_lmk_y_0']])
+    return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'],row[' eye_lmk_Z_0']])
+
 
 ################################################ Variables to set
-CAMERA = "camera3"
+CAMERA = "camera2"
 #If you want to cluster for a single group, otherwise set to none
 GROUP_NAME=None
 
-EVAL_GROUP = 'AM'
+EVAL_GROUP = 'BP'
 #Export title
 MODEL_TITLE = "KMEANS_projection_sphere_filtered"
 #Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
@@ -151,5 +138,45 @@ USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_
 
 
 CSV_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.csv"
-VIDEO_FILE = "/media/sebo-hri-lab/DATA/Trimmed_Videos/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.mp4"
+VIDEO_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.avi"
 
+################################################ Plots
+
+RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
+RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
+RGB_RED,BGR_RED=(1,0,0),(0,0,255)
+RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
+RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
+RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
+RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
+RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
+RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
+RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
+
+RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
+
+BGR_COLORS = [BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE]
+
+def save_plots(clusters, vectorList, eval=False, x_col=0, y_col=1, point_size=1, n_bins=150):
+
+    predictions = clusters.predict(vectorList)
+
+    if eval:
+        group_name = EVAL_GROUP + "_"
+    else:
+        group_name = ""
+
+    title = f"{MODEL_TITLE}_{group_name}{CAMERA}_{N_CLUSTERS}_clusters"
+
+    plt.scatter(vectorList[:, x_col], vectorList[:, y_col], c=RGB_COLORS[predictions], s=point_size)
+    plt.title(title)
+    plt.gca().invert_yaxis()
+    plt.savefig(f"plots/class_scatter_{title}.png")
+
+    plt.hist2d(vectorList[:, x_col], vectorList[:, y_col], bins=(n_bins, n_bins), norm=LogNorm())
+    plt.colorbar()
+    plt.title(title)
+    plt.gca().invert_yaxis()
+    plt.savefig(f"plots/class_hist_{title}.png")
+
+    plt.close()
