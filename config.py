@@ -1,3 +1,4 @@
+from os import EX_CANTCREAT
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -103,60 +104,6 @@ def multi_projection(row):
 def no_projection(row):
     return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'],row[' eye_lmk_Z_0']])
 
-
-################################################ Variables to set
-CAMERA = "camera2"
-#If you want to cluster for a single group, otherwise set to none
-GROUP_NAME=None
-
-EVAL_GROUP = 'BP'
-#Export title
-MODEL_TITLE = "KMEANS_projection_sphere_filtered"
-#Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
-PROJECTION = sphere_projection
-#number of features, 4 for multi_projection, 2 for the rest
-N_FEATURES = 5
-#number of CLUSTERS
-N_CLUSTERS = 10
-
-#Evaluation features used
-def vec(row):
-    return PROJECTION(row)
-
-
-def project(df):
-    vectorFrame = df.apply(lambda x: PROJECTION(x),axis=1)
-    vectorList = np.vstack(vectorFrame.to_numpy())
-    return vectorList
-################################################
-
-
-PICKLE_TITLE = f"models/{MODEL_TITLE}_{CAMERA}_clustering.pickle"
-FILE_NAME = f"data/shrink_data_{CAMERA}.csv"
-
-USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0',' eye_lmk_X_0',' eye_lmk_Y_0',' eye_lmk_Z_0']
-
-
-CSV_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.csv"
-VIDEO_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.avi"
-
-################################################ Plots
-
-RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
-RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
-RGB_RED,BGR_RED=(1,0,0),(0,0,255)
-RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
-RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
-RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
-RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
-RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
-RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
-RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
-
-RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
-
-BGR_COLORS = [BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE]
-
 def save_plots(clusters, vectorList, eval=False, x_col=0, y_col=1, point_size=1, n_bins=150):
 
     predictions = clusters.predict(vectorList)
@@ -180,3 +127,68 @@ def save_plots(clusters, vectorList, eval=False, x_col=0, y_col=1, point_size=1,
     plt.savefig(f"plots/class_hist_{title}.png")
 
     plt.close()
+
+#Evaluation features used
+def vec(row):
+    return PROJECTION(row)
+
+
+def project(df):
+    vectorFrame = df.apply(lambda x: PROJECTION(x),axis=1)
+    vectorList = np.vstack(vectorFrame.to_numpy())
+    return vectorList
+
+################################################ Variables to set
+CAMERA = "camera1"
+#If you want to cluster for a single group, otherwise set to none
+GROUP_NAME=None
+
+EVAL_GROUP = 'BR'
+#Export title
+MODEL_TITLE = "KMEANS_projection_screen_filtered"
+#Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
+PROJECTION = screen_projection
+#number of features, 4 for multi_projection, 2 for the rest
+N_FEATURES = 5
+#number of CLUSTERS
+N_CLUSTERS = 10
+
+EX_PARTICIPANT = "p2"
+
+CAMERA_1 = {"p2": ((282, 444), (-np.inf, 104)), "p3": ((432, np.inf), (-np.inf, 125))}
+CAMERA_2 = {"p1": ((-np.inf, -50), (-np.inf, 20)), "p3": ((160, np.inf), (-np.inf, 41))}
+CAMERA_3 = {"p1": ((-400, -100), (-np.inf, -60)), "p2": ((-np.inf, -350), (-np.inf, 150))}
+CAMERAS = {"camera1": CAMERA_1, "camera2": CAMERA_2, "camera3": CAMERA_3}
+
+################################################
+
+
+PICKLE_TITLE = f"models/{MODEL_TITLE}_{CAMERA}_clustering.pickle"
+FILE_NAME = f"data/shrink_data_{CAMERA}.csv"
+USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0',' eye_lmk_X_0',' eye_lmk_Y_0',' eye_lmk_Z_0']
+CSV_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.csv"
+DISPLAY_OPENFACE = False
+VIDEO_FILE = None
+
+if(DISPLAY_OPENFACE):
+    VIDEO_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.avi"
+else:
+    VIDEO_FILE = "/media/sebo-hri-lab/DATA/Trimmed_Videos/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.mp4"
+
+################################################ Plots
+
+RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
+RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
+RGB_RED,BGR_RED=(1,0,0),(0,0,255)
+RGB_YELLOW,BGR_YELLOW=(1,1,0),(0,255,255)
+RGB_PURPLE,BGR_PURPLE = (1,0,1),(255,0,255)
+RGB_CYAN,BGR_CYAN = (0,1,1),(255,255,0)
+RGB_ORANGE,BGR_ORANGE = (1,0.5,0),(0,140,255)
+RGB_GRAY,BGR_GRAY = (0.5,0.5,0.5),(150,150,150)
+RGB_BLACK,BGR_BLACK = (0,0,0),(0,0,0)
+RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
+
+RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
+
+BGR_COLORS = [BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE]
+
