@@ -1,0 +1,4 @@
+Good Regions:
+
+Participant 1:  x 282 - 444, y 104 (no upper bound)
+Participant 3:  lower left corner x 432, y 125

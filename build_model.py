@@ -5,8 +5,9 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.cluster import Birch
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import OPTICS
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import pickle
 import config
 
@@ -21,13 +22,18 @@ else:
 
 
 # %%
-vectorList = np.zeros((len(df),config.N_FEATURES))
-df['occurrence'] = df.apply(lambda x: config.PROJECTION(x),axis=1)
-vectorList = np.vstack(df['occurrence'].to_numpy())
+vectorList = config.project(df)
 print(f"{len(vectorList)} training frames")
 
 # %%
 clusters = KMeans(n_clusters=config.N_CLUSTERS).fit(vectorList)
+#clusters = Birch(threshold=0.5, branching_factor=3,n_clusters=config.N_CLUSTERS).fit(vectorList)
+
+#clusters = OPTICS().fit(vectorList)
+
+config.save_plots(clusters, vectorList)
+            
+
 
 # %%
 

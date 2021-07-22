@@ -1,10 +1,17 @@
-BLUE:
-GREEN: 1/PAPER
-RED:
-YELLOW: 1
-PURPLE
+BLUE: PAPER/JEBO/1
+GREEN: PAPER
+RED: PAPER/1
+YELLOW: JEBO/3
+MAGENTA
 CYAN
 ORANGE: 3
-GRAY
+GRAY JEBO,PAPER
 BLACK: PAPER
 WINE: PAPER
+
+
+Good Regions:
+
+Participant 1:  lower right corner: x: -50 y: 20
+
+Participant 3:  lower left corner:  x: 160, y 41
