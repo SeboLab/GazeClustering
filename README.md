@@ -6,15 +6,20 @@ The config.py file contains several different clustering mechanisms, you can exp
 For the underlying project we used KMEANS clustering, other clustering algorithms might be more appropriate depending on your use scenario.
 This set of files is meant to aid testing and veryfying different approaches to gaze-clustering with Open-Face data.
 
+# Setting up
 
 Before using the pipeline you will need:
 
-# Setting up
 [Python3](https://www.python.org/downloads/)
+
 [OpenCV](https://pypi.org/project/opencv-python/) For returning the video
+
 [Pandas](https://pandas.pydata.org/)
+
 [Pickle](https://docs.python.org/3/library/pickle.html)
+
 [Numpy](https://numpy.org/)
+
 ["Matplotlib"](https://matplotlib.org/)
 
 Additionally you will need the Videos + CSV files returned by OpenFace to run the pipeline
