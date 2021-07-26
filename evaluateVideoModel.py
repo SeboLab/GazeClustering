@@ -29,11 +29,10 @@ vectorList = config.project(df)
 
 # %%
 config.save_plots(clusters, vectorList, eval=True)
-
 predictions = clusters.predict(vectorList)
 
 # show all gaze points in the video
-title = f"{config.MODEL_TITLE}_{config.EVAL_GROUP}_{config.CAMERA}\nselect your desired clusters"
+title = f"{config.MODEL_TITLE}\nselect your desired clusters"
 
 fig, current_ax = plt.subplots() 
 plt.scatter(vectorList[:, 0], vectorList[:, 1], c=config.RGB_COLORS[predictions], s=1)
@@ -43,7 +42,8 @@ plt.draw()
 
 def rectangle_callback(eclick, erelease):
     '''
-    A callback function that is executed when a rectangle is drawn on the figure of clusters.
+    A callback function that is executed when a rectangle is drawn on the figure of clusters. 
+    Select the region you desire to view
     '''
 
     # get rectangle corners
@@ -58,24 +58,6 @@ def rectangle_callback(eclick, erelease):
 
     display_video(indices)
 
-
-def show_defined_regions():
-    camera = config.CAMERAS[config.CAMERA]
-
-    coordinates = camera[config.EX_PARTICIPANT]
-
-    x1, x2 = coordinates[0]
-    y1, y2 = coordinates[1]
-
-    # get all points that fall within the rectangle
-    x_mask = (vectorList[:,0] > min(x1, x2)) & (vectorList[:,0] < max(x1, x2))
-    y_mask = (vectorList[:,1] > min(y1, y2)) & (vectorList[:,1] < max(y1, y2))
-
-    indices = np.nonzero(x_mask & y_mask)[0]
-
-    display_video(indices)
-
-
 def display_video(indices):
 
     # read in the video
@@ -89,7 +71,7 @@ def display_video(indices):
     box_lower_right = (frame_width//2 + BOX_RADIUS, frame_height//2 + BOX_RADIUS)
 
     # set up the video writer
-    out = cv2.VideoWriter(f'videos/eval_extract_{config.MODEL_TITLE}_{config.N_CLUSTERS}_clusters_pick.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 25, (frame_width,frame_height))
+    out = cv2.VideoWriter(f'videos/eval_extract_{config.MODEL_TITLE}_{config.N_CLUSTERS}_clusters_pick.avi',cv2.VideoWriter_fourcc('M','J','P','G'), config.FRAME_RATE, (frame_width,frame_height))
 
     for i in indices:
 
@@ -114,20 +96,19 @@ def display_video(indices):
     out.release()
     cv2.destroyAllWindows()
 
-
 def toggle_color(event):
     print(event.key)
 
-# toggle_color.RS = RectangleSelector(current_ax,
-#                                     rectangle_callback, 
-#                                     drawtype='box',
-#                                     useblit=True,
-#                                     button=[1, 3],
-#                                     minspanx=5,
-#                                     minspany=5,
-#                                     spancoords='pixels',
-#                                     interactive=True)
-# plt.connect('key_press_event', toggle_color)
-
+    
+toggle_color.RS = RectangleSelector(current_ax,
+                                     rectangle_callback, 
+                                     drawtype='box',
+                                     useblit=True,
+                                     button=[1, 3],
+                                     minspanx=5,
+                                     minspany=5,
+                                     spancoords='pixels',
+                                     interactive=True)
+plt.connect('key_press_event', toggle_color)
 plt.show()
 

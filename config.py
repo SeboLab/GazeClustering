@@ -4,6 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+'''
+Predefined Variables
+
+1) Column names
+2) Video Frame Height
+3) Projection Settings
+'''
+#1
 GAZE_ANGLE_X = ' gaze_angle_x'
 GAZE_ANGLE_Y = ' gaze_angle_y'
 GAZE_0_X = ' gaze_0_x'
@@ -12,17 +20,29 @@ GAZE_0_Z = ' gaze_0_z'
 GAZE_1_X = ' gaze_1_x'
 GAZE_1_Y = ' gaze_1_y'
 GAZE_1_Z = ' gaze_1_z'
-
+EYE_LMK_X_0 = ' eye_lmk_x_0'
+EYE_LMK_Y_0 = ' eye_lmk_y_0'
+EYE_LMK_3D_0_X = ' eye_lmk_X_0'
+EYE_LMK_3D_0_Y = ' eye_lmk_Y_0'
+EYE_LMK_3D_0_Z = ' eye_lmk_Z_0'
+#2
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 
+#3
 MAX_PROJ_SIZE = 3500
-
 SPHERE_RADIUS = 1000
 
+'''
+Several Gaze Projection Methods compared
+'''
+
+#2D projection to the edge
 def edge_projection(row):
     # frame shape is (width, height)
     x_plane_normal = np.array([1, 0, 0])
+    x_plane_point = None
+    y_plane_point = None
     if row[GAZE_0_X] > 0:
         # participant is looking right
         x_plane_point = np.array([FRAME_WIDTH, 0, 0])
@@ -36,14 +56,15 @@ def edge_projection(row):
     else:
         # participant is looking up
         y_plane_point = np.array([0, 0, 0])
-    line_point = np.array([row[' eye_lmk_x_0'], row[' eye_lmk_y_0'], 0])
+    line_point = np.array([row[EYE_LMK_X_0], row[EYE_LMK_Y_0], 0])
     line_vector = np.array([row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z]])
     x_t = np.dot((x_plane_point - line_point), x_plane_normal) / np.dot(line_vector, x_plane_normal)
     y_t = np.dot((y_plane_point - line_point), y_plane_normal) / np.dot(line_vector, y_plane_normal)
     if np.abs(x_t) < np.abs(y_t):
-        # gaze falls on the left/ri, row[' eye_lmk_z_0'ower edge
+        # gaze falls on the left/ri, row[EYE_LMK_Y_0] over edge
         return (line_point + line_vector * y_t).astype(int)[[0,1]]
 
+#3D projection to the camera plane
 def screen_projection(row):
     '''
     Uses 3D mm values for eye positions
@@ -52,7 +73,7 @@ def screen_projection(row):
     z_plane_normal = np.array([0, 0, 1])
     z_plane_point = np.array([0, 0, 0])
 
-    line_point = np.array([row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'], row[' eye_lmk_Z_0']])
+    line_point = np.array([row[EYE_LMK_3D_0_X], row[EYE_LMK_3D_0_Y], row[EYE_LMK_3D_0_Z]])
     line_vector = np.array([row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z]])
     z_t = np.dot((z_plane_point - line_point), z_plane_normal) / np.dot(line_vector, z_plane_normal)
 
@@ -69,11 +90,11 @@ def screen_projection(row):
 
     return val
 
-
+#3D projection on a sphere roughly centered around participant head
 def sphere_projection(row):
     # https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection#Calculation_using_vectors_in_3D
     c = np.array([0, 0, SPHERE_RADIUS])
-    o = np.array([row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'], row[' eye_lmk_Z_0']])
+    o = np.array([row[EYE_LMK_3D_0_X], row[EYE_LMK_3D_0_Y], row[EYE_LMK_3D_0_Z]])
     u = np.array([row[GAZE_0_X], row[GAZE_0_Y], row[GAZE_0_Z]])
     
     b24ac = (np.dot(u, o - c) ** 2) - (np.dot(o - c, o - c) - SPHERE_RADIUS ** 2)
@@ -94,26 +115,23 @@ def sphere_projection(row):
         else:
             return proj_plus
 
- 
+#Combining edge and screen projection 
 def multi_projection(row):
     r1 = edge_projection(row)
     r2 = screen_projection(row)
     return np.array([r1[0],r1[1],r2[0],r2[1]]).astype(int)
 
-
+#Just return a subset of the used data without any changes
 def no_projection(row):
-    return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[' eye_lmk_X_0'], row[' eye_lmk_Y_0'],row[' eye_lmk_Z_0']])
+    return np.array([row[GAZE_ANGLE_X], row[GAZE_ANGLE_Y], row[EYE_LMK_3D_0_X], row[EYE_LMK_3D_0_Y],row[EYE_LMK_3D_0_Z]])
 
+#Function for plotting the clusters
 def save_plots(clusters, vectorList, eval=False, x_col=0, y_col=1, point_size=1, n_bins=150):
 
     predictions = clusters.predict(vectorList)
 
-    if eval:
-        group_name = EVAL_GROUP + "_"
-    else:
-        group_name = ""
-
-    title = f"{MODEL_TITLE}_{group_name}{CAMERA}_{N_CLUSTERS}_clusters"
+    
+    title = f"{MODEL_TITLE}_{N_CLUSTERS}_clusters"
 
     plt.scatter(vectorList[:, x_col], vectorList[:, y_col], c=RGB_COLORS[predictions], s=point_size)
     plt.title(title)
@@ -138,44 +156,9 @@ def project(df):
     vectorList = np.vstack(vectorFrame.to_numpy())
     return vectorList
 
-################################################ Variables to set
-CAMERA = "camera1"
-#If you want to cluster for a single group, otherwise set to none
-GROUP_NAME=None
-
-EVAL_GROUP = 'BR'
-#Export title
-MODEL_TITLE = "KMEANS_projection_screen_filtered"
-#Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
-PROJECTION = screen_projection
-#number of features, 4 for multi_projection, 2 for the rest
-N_FEATURES = 5
-#number of CLUSTERS
-N_CLUSTERS = 10
-
-EX_PARTICIPANT = "p2"
-
-CAMERA_1 = {"p2": ((282, 444), (-np.inf, 104)), "p3": ((432, np.inf), (-np.inf, 125))}
-CAMERA_2 = {"p1": ((-np.inf, -50), (-np.inf, 20)), "p3": ((160, np.inf), (-np.inf, 41))}
-CAMERA_3 = {"p1": ((-400, -100), (-np.inf, -60)), "p2": ((-np.inf, -350), (-np.inf, 150))}
-CAMERAS = {"camera1": CAMERA_1, "camera2": CAMERA_2, "camera3": CAMERA_3}
-
-################################################
-
-
-PICKLE_TITLE = f"models/{MODEL_TITLE}_{CAMERA}_clustering.pickle"
-FILE_NAME = f"data/shrink_data_{CAMERA}.csv"
-USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,' eye_lmk_x_0',' eye_lmk_y_0',' eye_lmk_X_0',' eye_lmk_Y_0',' eye_lmk_Z_0']
-CSV_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.csv"
-DISPLAY_OPENFACE = False
-VIDEO_FILE = None
-
-if(DISPLAY_OPENFACE):
-    VIDEO_FILE = "/media/sebo-hri-lab/DATA/OpenFace/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.avi"
-else:
-    VIDEO_FILE = "/media/sebo-hri-lab/DATA/Trimmed_Videos/group_"+EVAL_GROUP+"_"+CAMERA+"_trim.mp4"
-
 ################################################ Plots
+
+#Defining 10 Colors in RGB (for plots) and BGR (for opencv visualisation) format
 
 RGB_BLUE,BGR_BLUE=(0,0,1),(255,0,0)
 RGB_GREEN,BGR_GREEN=(0,1,0),(0,255,0)
@@ -191,4 +174,37 @@ RGB_WINE,BGR_WINE = (0.5,0,0.25),(75,0,127)
 RGB_COLORS = np.array([RGB_BLUE,RGB_GREEN,RGB_RED,RGB_YELLOW,RGB_PURPLE,RGB_CYAN,RGB_ORANGE,RGB_GRAY,RGB_BLACK,RGB_WINE])
 
 BGR_COLORS = [BGR_BLUE,BGR_GREEN,BGR_RED,BGR_YELLOW,BGR_PURPLE,BGR_CYAN,BGR_ORANGE,BGR_GRAY,BGR_BLACK,BGR_WINE]
+
+################################################
+
+MODEL_TITLE = "KMEANS_projection_screen_filtered"
+#Projection Function either edge_projection (2D) or screen_projection (3D), mult_projection (both), no_projection (None)
+PROJECTION = screen_projection
+#number of features
+N_FEATURES = 5
+#number of CLUSTERS
+N_CLUSTERS = 10
+
+PICKLE_TITLE = f"models/{MODEL_TITLE}_clustering.pickle"
+
+USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_1_Y,GAZE_1_Z,EYE_LMK_X_0,EYE_LMK_Y_0,EYE_LMK_3D_0_X,EYE_LMK_3D_0_Y,EYE_LMK_3D_0_Z]
+
+#CSV file returned by OpenFace
+CSV_FILE = "data/123OpenFaceDemo.csv"
+#Show with OPENFACE overlay or without
+DISPLAY_OPENFACE = False
+#Use Predefined Points
+USE_PREDEF = False
+#Define Points
+PREDEF = ((100,200),(100,200))
+
+FRAME_RATE = 25
+
+
+VIDEO_FILE = None
+
+if(DISPLAY_OPENFACE):
+    VIDEO_FILE = "/data/123OpenFaceDemo.avi"
+else:
+    VIDEO_FILE = "/data/123OpenFaceDemo_original.mp4"
 

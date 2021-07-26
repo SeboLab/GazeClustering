@@ -11,15 +11,11 @@ from matplotlib.colors import LogNorm
 import pickle
 import config
 
-print(config.MODEL_TITLE)
-
+print('building model ' + config.MODEL_TITLE)
 
 # %%
-if(config.GROUP_NAME!=None):
-    df = pd.read_csv(f"/media/sebo-hri-lab/DATA/OpenFace/group_{config.GROUP_NAME}_{config.CAMERA}_trim.csv")
-else:
-    df = pd.read_csv(config.FILE_NAME)
 
+df = pd.read_csv(config.CSV_FILE)
 
 # %%
 vectorList = config.project(df)
@@ -27,18 +23,10 @@ print(f"{len(vectorList)} training frames")
 
 # %%
 clusters = KMeans(n_clusters=config.N_CLUSTERS).fit(vectorList)
-#clusters = Birch(threshold=0.5, branching_factor=3,n_clusters=config.N_CLUSTERS).fit(vectorList)
-
-#clusters = OPTICS().fit(vectorList)
-
 config.save_plots(clusters, vectorList)
-            
-
 
 # %%
 
 with open(config.PICKLE_TITLE, 'wb') as handle:
     pickle.dump(clusters, handle, protocol=pickle.HIGHEST_PROTOCOL)
 print("finished writing model")
-
-

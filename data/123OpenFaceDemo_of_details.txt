@@ -1,0 +1,13 @@
+Input:/media/sebo-hri-lab/DATA/Trimmed_Videos/123OpenFaceDemo.mp4
+Input full path:/media/sebo-hri-lab/DATA/Trimmed_Videos/123OpenFaceDemo.mp4
+Camera parameters:875,875,640,360
+Output HOG:123OpenFaceDemo.hog
+Output video:123OpenFaceDemo.avi
+Output aligned directory:123OpenFaceDemo_aligned
+Output csv:123OpenFaceDemo.csv
+Gaze: 1
+AUs: 1
+Landmarks 2D: 1
+Landmarks 3D: 1
+Pose: 1
+Shape parameters: 1
