@@ -192,11 +192,8 @@ USED_COLS = [GAZE_ANGLE_X,GAZE_ANGLE_Y,GAZE_0_X,GAZE_0_Y,GAZE_0_Z,GAZE_1_X,GAZE_
 #CSV file returned by OpenFace
 CSV_FILE = "data/123OpenFaceDemo.csv"
 #Show with OPENFACE overlay or without
-DISPLAY_OPENFACE = False
-#Use Predefined Points
-USE_PREDEF = False
-#Define Points
-PREDEF = ((100,200),(100,200))
+DISPLAY_OPENFACE = True
+
 
 FRAME_RATE = 25
 
@@ -204,7 +201,7 @@ FRAME_RATE = 25
 VIDEO_FILE = None
 
 if(DISPLAY_OPENFACE):
-    VIDEO_FILE = "/data/123OpenFaceDemo.avi"
+    VIDEO_FILE = "./data/123OpenFaceDemo.avi"
 else:
-    VIDEO_FILE = "/data/123OpenFaceDemo_original.mp4"
+    VIDEO_FILE = "./data/123OpenFaceDemo_original.mp4"
 

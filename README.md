@@ -38,5 +38,16 @@ Evaluate the model `python3 evaluateVideoModel.py`
 
 Select a region you want to view by drawing a rectangle in the plot that shows up
 
+![Drawing rectangle](/README_data/ClusterSelection.png)
+
 The video containing the selected frames should play and be saved to the videos folder.
+
+In the config.py file set the DISPLAY_OPENFACE to show the video files containing the openface visualisation, 
+
+![Picture of OpenFace analysis on Face](/README_data/ImageWithData.png)
+
+
+or the original video.
+
+![Picture of no OpenFace](/README_data/ImageWOOpenFace.png)
 
