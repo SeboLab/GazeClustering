@@ -27,6 +27,7 @@ Additionally you will need the Videos + CSV files returned by OpenFace to run th
 
 # Interacting with the Clusters:
 In config.py set the data-location and the model name correctly. Set the number of clusters and the pre-training preparation (projections) performed on the data before clustering as well as the desired frame-rate of the output video (the video that is saved, the displayed video will compute as fast as the leftover parts)
+
 In build_model.py you can change the specific clustering algorithm used.
 
 Build the model using `python3 build_model.py`
@@ -46,8 +47,15 @@ In the config.py file set the DISPLAY_OPENFACE to show the video files containin
 
 ![Picture of OpenFace analysis on Face](/README_data/ImageWithData.png)
 
-
 or the original video.
 
 ![Picture of no OpenFace](/README_data/ImageWOOpenFace.png)
 
+# Setting custom ranges
+
+Depending on the quality of your video files and the openFace analys (or other software you used for gaze extraction), the viability of classifying gaze using clusters will differ. 
+
+In our case what worked best was defining rectangular regions, and if a gaze was projected into a certain rectangular region we would classify it accordingly (for instance looking left, looking right etc)
+
+Since each set of videos will be different you will need to customize the range. 
+The rectangular video selection tool should help doing just that. In config.py set `PREDEF_MODE=true` and put in the corner coordinates of your rectangular region in the `PREDEF_RANGE` variable

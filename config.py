@@ -195,6 +195,10 @@ CSV_FILE = "data/123OpenFaceDemo.csv"
 DISPLAY_OPENFACE = True
 
 
+PREDEF_RANGE = ((1, 100), (2, 200))
+
+PREDEF_MODE = False
+
 FRAME_RATE = 25
 
 

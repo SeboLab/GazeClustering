@@ -12,6 +12,7 @@ from matplotlib.patches import Rectangle
 import config
 
 # %%
+#Load clustering model
 with open(config.PICKLE_TITLE, 'rb') as f:
     clusters = pickle.load(f)
 
@@ -39,6 +40,26 @@ plt.scatter(vectorList[:, 0], vectorList[:, 1], c=config.RGB_COLORS[predictions]
 plt.title(title)
 plt.gca().invert_yaxis()
 plt.draw()
+
+
+
+def show_defined_regions():
+    coordinates = config.PREDEF_RANGE
+
+    x1, x2 = coordinates[0]
+    y1, y2 = coordinates[1]
+
+    # get all points that fall within the rectangle
+    x_mask = (vectorList[:,0] > min(x1, x2)) & (vectorList[:,0] < max(x1, x2))
+    y_mask = (vectorList[:,1] > min(y1, y2)) & (vectorList[:,1] < max(y1, y2))
+
+    indices = np.nonzero(x_mask & y_mask)[0]
+
+    rect = plt.Rectangle((x1, y1), x2-x1, y2-y1, fill=False)
+    current_ax.add_patch(rect)
+    display_video(indices)
+
+
 
 def rectangle_callback(eclick, erelease):
     '''
@@ -100,6 +121,8 @@ def toggle_color(event):
     print(event.key)
 
     
+if config.PREDEF_MODE:
+    show_defined_regions()
 toggle_color.RS = RectangleSelector(current_ax,
                                      rectangle_callback, 
                                      drawtype='box',
